@@ -20,7 +20,38 @@ def get_poems(url):
 	trycount = 0
     page = get_page(url,SLEEP_TIME_S)
     soup = BeautifulSoup(page,"html.parser")
-    kona_div = soup.find_all("div",class_ = "KonaBody")
+    solSiir = soup.find("div",{"id":"solSiirMetinDV"})
+    title = ""
+    if solSiir:
+        title = solSiir.find("h1").text.split('-')[0]
+    kona_div = soup.find("div",class_ = "KonaBody")
+    text = ""
     if kona_div:
-        poem = kona_div[0].find('p').text
-    
+        text = kona_div.find('p').text
+    if poem and title:
+        poems.append("title":title,"text":text})
+        print("success")
+
+    try:
+        next_link = soup.find('a',{"id":"next_link"})
+        next_url = "http://www.poemhunter.com" + next_link.get("href")
+    except IndexError:
+        print("END")
+        return poems
+
+    print(next_link.get("title"))
+    poems += get_poems(next_url)
+
+    return poems
+
+if __name__ = "__main__":
+    url = input("url?\n")
+    filename = input("filename?\n")
+    with open(filename,'a') as f:
+        for poem in get_poems(url):
+            f.write("__BEGIN__")
+            f.write("__TITLE__")
+            f.write(poem["title"])
+            f.write("__TEXT__")
+            f.write(poem["text"])
+            f.write("__END__")
