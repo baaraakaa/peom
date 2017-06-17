@@ -17,7 +17,7 @@ def get_page(url,timeout):
 
 def get_poems(url):
     poems = []
-	trycount = 0
+    trycount = 0
     page = get_page(url,SLEEP_TIME_S)
     soup = BeautifulSoup(page,"html.parser")
     solSiir = soup.find("div",{"id":"solSiirMetinDV"})
@@ -28,23 +28,23 @@ def get_poems(url):
     text = ""
     if kona_div:
         text = kona_div.find('p').text
-    if poem and title:
-        poems.append("title":title,"text":text})
+    if text and title:
+        poems.append({"title":title,"text":text})
         print("success")
 
     try:
         next_link = soup.find('a',{"id":"next_link"})
         next_url = "http://www.poemhunter.com" + next_link.get("href")
-    except IndexError:
+    except AttributeError:
         print("END")
         return poems
 
-    print(next_link.get("title"))
+    print(next_link.get("title").replace(u"\u2018", "'").replace(u"\u2019", "'"))
     poems += get_poems(next_url)
 
     return poems
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     url = input("url?\n")
     filename = input("filename?\n")
     with open(filename,'a') as f:
