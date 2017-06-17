@@ -20,6 +20,8 @@ def get_poems(url):
     trycount = 0
     page = get_page(url,SLEEP_TIME_S)
     soup = BeautifulSoup(page,"html.parser")
+    for br in soup.find_all("br"):
+        br.replace_with("\n")
     solSiir = soup.find("div",{"id":"solSiirMetinDV"})
     title = ""
     if solSiir:
@@ -52,6 +54,6 @@ if __name__ == "__main__":
             f.write("__BEGIN__")
             f.write("__TITLE__")
             f.write(poem["title"])
-            f.write("__TEXT__")
-            f.write(poem["text"])
+            f.write("__TEXT__\n")
+            f.write(poem["text"].strip())
             f.write("__END__")
