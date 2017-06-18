@@ -1,3 +1,11 @@
+#This script scrapes poemhunter.com for poems
+#The url passed should be the link to a poems
+#Script will scrape until it reaches the end of poems by that author
+##
+#Tip: in order to start at the beginning of an artists poems,
+#   sort by title and start at the beginning of the alphabet
+
+
 import urllib.request as urlreq
 import urllib.error as urlerr
 from bs4 import BeautifulSoup
