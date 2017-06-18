@@ -41,7 +41,7 @@ def get_poems(url):
         print("END")
         return poems
 
-    print(next_link.get("title").replace(u"\u2018", "'").replace(u"\u2019", "'"))
+    print(next_link.get("title").replace(u"\u2018", "'").replace(u"\u2019", "'").replace(u"\u2013", "--"))
     poems += get_poems(next_url)
 
     return poems
@@ -51,9 +51,8 @@ if __name__ == "__main__":
     filename = input("filename?\n")
     with open(filename,'a') as f:
         for poem in get_poems(url):
-            f.write("__BEGIN__")
-            f.write("__TITLE__")
+            f.write("\n__TITLE__ ")
             f.write(poem["title"])
-            f.write("__TEXT__\n")
-            f.write(poem["text"].strip())
-            f.write("__END__")
+            f.write(" __TEXT__\n")
+            f.write(poem["text"].replace(u"\ufffd","").strip())
+            f.write(" __END__ ")
