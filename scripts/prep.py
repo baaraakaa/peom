@@ -1,8 +1,8 @@
 #This module prepares the data for the RNN
 
 import nltk
+import itertools
 
-VOCAB_SIZE = 8000
 UNKNOWN_TOKEN = "__UNKNOWN_TOKEN__"
 
 def tokenize(string):
@@ -12,14 +12,26 @@ def tokenize(string):
     tokens = nltk.word_tokenize(string);
     return ['\n' if token == very_obscure_string.strip() else token for token in tokens]
 
-def get_tokens(filename):
+
+
+
+def get_sequences(filename,vocab_size):
     with open(filename,'r') as f:
         poems = f.read().split("__END__")
     tokenized_poems = [tokenize(poem).append("__END__") for poem in poems]
+
+    maxlen = 0
+    for poem in poems:
+        maxlen = len(poem) if len(poem) > maxlen else maxlen
+
+    for poem in poems:
+        while len(poem) < maxlen:
+            poem.append('')
+
     token_freq = nltk.FreqDist(itertools.chain(*tokenized_poems))
     print(len(token_freq.items()),"unique tokens")
 
-    vocab = token_freq.most_common(VOCAB_SIZE - 1)
+    vocab = token_freq.most_common(vocab_size - 1)
     index_to_token = [x[0] for x in vocab]
     index_to_token.append(UNKNOWN_TOKEN)
     token_to_index = dict([(t,i) for i,t in enumerate(index_to_token)])
@@ -29,5 +41,7 @@ def get_tokens(filename):
 
     for i,poem in enumerate(tokenized_poems):
         tokenized_poems[i] = [t if t in token_to_index else UNKNOWN_TOKEN for t in poem]
+
+    return (tokenized_poems,index_to_token,token_to_index) 
 
     print("Sample poem:",poems[0],"Sample prepped:",tokenized_poems[0],sep='\n')
