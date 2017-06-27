@@ -28,6 +28,7 @@ BATCH_SIZE = args['batch_size']
 HIDDEN_DIM = args['hidden_dim']
 WEIGHT_FILE = args['weight_file']
 LAYER_NUM = args['layer_num']
+MODE = args['mode']
 
 def load_data(filename):
     seqs,index_to_token,token_to_index = prep.get_sequences(filename,VOCAB_SIZE)
@@ -60,7 +61,7 @@ def init_model():
       model.add(LSTM(HIDDEN_DIM, return_sequences=True))
     model.add(TimeDistributed(Dense(VOCAB_SIZE)))
     model.add(Activation('softmax'))
-    if mode == 'load' or mode == 'gen':
+    if MODE == 'load' or MODE == 'gen':
         model.load_weights(WEIGHT_FILE)
     model.compile(loss="categorical_crossentropy", optimizer="rmsprop")
     return model
@@ -88,7 +89,7 @@ def generate(model,seq_length,index_to_token):
 def run():
     x,y,index_to_token,seq_length = load_data(DATA_DIR)
     model = init_model()
-    if mode == 'gen':
+    if MODE == 'gen':
         generate(model,seq_length,index_to_token)
     else train(x,y,model)
 
