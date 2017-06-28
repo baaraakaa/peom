@@ -9,8 +9,9 @@ from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM, SimpleRNN
 from keras.layers.wrappers import TimeDistributed
 from keras.callbacks import ModelCheckpoint
+from keras import backend as K
 import argparse
-from RNN_utils import *
+import os
 
 VOCAB_SIZE = 8000
 
@@ -29,6 +30,12 @@ HIDDEN_DIM = args['hidden_dim']
 WEIGHT_FILE = args['weight_file']
 LAYER_NUM = args['layer_num']
 MODE = args['mode']
+
+def set_keras_backend(backend):
+    if K.backend() != backend:
+        os.environ['KERAS_BACKEND'] = backend
+        reload(K)
+        assert K.backend() == backend
 
 def load_data(filename):
     seqs,index_to_token,token_to_index = prep.get_sequences(filename,VOCAB_SIZE)
@@ -79,19 +86,20 @@ def generate(model,seq_length,index_to_token):
     for i in range(seq_length):
         x[0,i,:][ix[-1]] = 1
         next_tok = index_to_token[ix[-1]]
-        if next_tok not == '\n':
+        if next_tok != '\n':
             print(index_to_token[ix[-1]],end="")
-        else print()
+        else: print()
         ix = np.argmax(model.predict(x[:,:i+1,:])[0],1)
         y_tok.append(index_to_token[ix[-1]])
     return y_tok
 
 def run():
+    set_keras_backend("theano")
     x,y,index_to_token,seq_length = load_data(DATA_DIR)
     model = init_model()
     if MODE == 'gen':
         generate(model,seq_length,index_to_token)
-    else train(x,y,model)
+    else: train(x,y,model)
 
 if __name__ == '__main__':
     run()
